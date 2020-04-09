@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>登录</title>
+    <script type="text/html" template>
+        <link rel="stylesheet" href="{{ layui.setter.base }}style/login.css" media="all">
+    </script>
+</head>
+<body>
+
+<div class="c-subscribe-box u-align-center">
+    <div class="rainbow"><span></span><span></span></div>
+    <div class="c-subscribe-box__wrapper">
+        <h3 class="c-subscribe-box__title">登录至管理中心</h3>
+        <input class="u-align-center username" type="text" placeholder="请输入账号">
+        <input class="u-align-center password" type="password" placeholder="请输入密码">
+        <input class="full-button" type="button" value="确认登录"/>
+    </div>
+</div>
+
+<script>
+    layui.use(['jquery', 'request', 'layer', 'setter'], function () {
+        let $ = layui.jquery, request = layui.request, layer = layui.layer, setter = layui.setter,
+            router = layui.router(),
+            search = router.search;
+
+        $('.full-button').click(function () {
+            request.post("/admin/auth/login", {user: $('.username').val(), pass: $('.password').val()}, res => {
+
+                //存储token
+                layui.data(setter.tableName, {
+                    key: setter.request.tokenName
+                    , value: res.data.token
+                });
+
+                //存储权限
+                layui.data(setter.tableName, {
+                    key: 'permission'
+                    , value: res.data.permission
+                });
+
+                location.hash = search.redirect ? decodeURIComponent(search.redirect) : '/';
+            });
+        });
+
+        $(document).keyup(function () {
+            if (event.keyCode == 13) {
+                $('.full-button').click();
+            }
+        });
+    });
+
+</script>
+</body>
+</html>
